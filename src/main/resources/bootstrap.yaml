@@ -20,12 +20,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   datasource:
-    #url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL
-    #driver-class-name: org.h2.Driver
-    #schema: classpath:config/schema.sql  #仅数据库结构
-    #data: classpath:config/data.sql  #数据库结构+数据
-    url: jdbc:mysql://127.0.0.1:3306/test?useSSL=false&useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true
-    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/im?useSSL=false&useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
@@ -56,13 +52,13 @@ chao:
   cloud:
     im:
       tai: #腾讯
-        app-id: 2118014633
-        app-key: LirwLm1HMBGXDThB
-        session: chaojunzi
+        app-id:  
+        app-key:  
+        session:  
       bai:
-        app-id: 16704965
-        api-key: Qp5FlLOztEannkQrb4CKop1o
-        secret-key: ssT7zQLPMqxsR3QDa0wnTlCnaxd6vyUY
+        app-id:  
+        api-key:  
+        secret-key:  
     ftp:
       config: 
         local: true #使用本地硬盘

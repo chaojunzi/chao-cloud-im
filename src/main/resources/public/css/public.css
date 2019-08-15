@@ -15,6 +15,7 @@
 .layui-height20 {
 	height: 20px;
 }
+
 .layui-height80 {
 	height: 80px;
 }
@@ -22,12 +23,15 @@
 .layui-padding5 {
 	padding: 5px;
 }
+
 .layui-margin5 {
 	margin: 5px;
 }
+
 .layui-padding10 {
 	padding: 10px;
 }
+
 .layui-margin10 {
 	margin: 10px;
 }
@@ -38,4 +42,11 @@
 
 .layui-margin20 {
 	margin: 20px;
+}
+
+body {
+	background-color: #ABABAB;
+	color: #333333;
+	font: 12px/150% 'Microsoft YaHei', Arial, Verdana, "宋体";
+	font-weight: normal;
 }
