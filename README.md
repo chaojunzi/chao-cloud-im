@@ -19,8 +19,8 @@ spring-boot为基础，websocket+mybatis-plus+layui+layim+腾讯闲聊机器人+
 ``` 
 //1.导入sql
 	resource
-	│
-	└─sql/mysql-im.sql
+	  │
+	  └─sql/mysql-im.sql
 //2.修改 bootstrap.yaml 
 		chao:
 		  cloud:
@@ -35,11 +35,11 @@ spring-boot为基础，websocket+mybatis-plus+layui+layim+腾讯闲聊机器人+
 		        secret-key:  
 //3.引入layim.js
 	resource
-	│
-	└─static   		 
-	   └─layui 		
-	   	└─lay		
-	 	   └─modules/layim.js
+	  │
+	  └─static   		 
+	     └─layui 		
+	   	  └─lay		
+	 	     └─modules/layim.js
 ```
 
 ## 注意
