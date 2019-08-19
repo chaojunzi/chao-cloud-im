@@ -1,22 +1,29 @@
-/*
- *
- * Template Name: Fullscreen Login
- * Description: Login Template with Fullscreen Background Slideshow
- * Author: Anli Zaimi
- * Author URI: http://azmind.com
- *
- */
 body {
-	background: #f8f8f8;
-	/*font-family: 'PT Sans', Helvetica, Arial, sans-serif;*/
 	font-family: "Microsoft YaHei", 微软雅黑, "Microsoft JhengHei", 华文细黑,
 		STHeiti, MingLiu;
 	text-align: center;
 	color: #fff;
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
 }
 
-.page-container {
-	margin: 120px auto 0 auto;
+.bgdiv {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: -999;
+}
+
+.bgdiv img {
+	width: 100%;
+	height: 100%;
+	border: 0px;
+}
+
+.content {
+	padding-top: 8%;
+	margin: 0 auto;
 }
 
 h1 {
@@ -64,12 +71,12 @@ input {
 
 .userName {
 	background-size: 20px;
-	background-image: url(../img/user.png);
+	background-image: url(img/user.png);
 }
 
 .password {
 	background-size: 20px;
-	background-image: url(../img/key.png);
+	background-image: url(img/key.png);
 }
 
 #verify-icon {
@@ -79,7 +86,7 @@ input {
 	background-position: right;
 	background-size: 70%;
 	background-repeat: no-repeat;
-	background-image: url(../img/verify.png);
+	background-image: url(img/verify.png);
 	left: .5em;
 	top: 38%;
 }
@@ -165,26 +172,16 @@ button:active {
 	border: 0px solid #ef4300;
 }
 
-.connect {
+.famous {
 	width: 60%;
 	margin: 50px auto 0 auto;
 	font-size: 14px;
 	text-shadow: 0 1px 3px rgba(0, 0, 0, .2);
 }
 
-.connect p {
+.famous p {
 	position: relative;
 	left: -140%;
+	color: white;
 	top: 0
-}
-
-.connect a {
-	display: inline-block;
-	width: 32px;
-	height: 35px;
-	margin-top: 15px;
-	-o-transition: all .2s;
-	-moz-transition: all .2s;
-	-webkit-transition: all .2s;
-	-ms-transition: all .2s;
 }
