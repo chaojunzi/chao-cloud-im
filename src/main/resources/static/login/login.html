@@ -37,6 +37,12 @@
 	</div>
 	<script src="/layui/layui.js"></script>
 	<script>
+		//顶层路径判断
+		window.onload = function() {
+			if (window.parent.window != window) {
+				window.top.location = "/login";
+			}
+		}
 		layui.use([ 'form', 'layer', 'jquery' ], function() {
 			var form = layui.form, layer = parent.layer === undefined ? layui.layer : top.layer
 			var $ = layui.jquery;
@@ -119,12 +125,6 @@
 			}
 			function addDisabled() {
 				$("#submit").text("Sign in ...").attr("disabled", "disabled").addClass("layui-disabled");
-			}
-			//顶层路径判断
-			window.onload = function() {
-				if (window.parent.window != window) {
-					window.top.location = "/login";
-				}
 			}
 			//切换背景图
 			var i = 0;
