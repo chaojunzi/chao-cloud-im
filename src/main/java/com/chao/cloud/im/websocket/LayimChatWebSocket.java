@@ -1,23 +1,14 @@
 package com.chao.cloud.im.websocket;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-
-import org.springframework.stereotype.Component;
-
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.json.JSONUtil;
+import cn.hutool.log.StaticLog;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.chao.cloud.common.core.SpringContextUtil;
 import com.chao.cloud.common.exception.BusinessException;
@@ -36,17 +27,19 @@ import com.chao.cloud.im.websocket.constant.MsgEnum;
 import com.chao.cloud.im.websocket.model.ImMsgDTO;
 import com.chao.cloud.im.websocket.model.WsMsgDTO;
 import com.chao.cloud.im.websocket.model.WsMsgVO;
-
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.log.StaticLog;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.websocket.*;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 单聊
@@ -71,7 +64,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 			this.alreadyLogin(session);
 			return;
 		}
-		super.onOpen(session, sid);
+		super.open(session, sid);
 		// 发送上线消息
 		this.sendAll(WsMsgDTO.buildMsg(MsgEnum.ON_LINE, sid));
 		// 推送离线消息
@@ -81,7 +74,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 	/**
 	 * 收到客户端消息后调用的方法
 	 *
-	 * @param message 客户端发送过来的消息
+	 * @param msg 客户端发送过来的消息
 	 * @throws IOException */
 	@OnMessage
 	public void onMessage(String msg, Session session) {
