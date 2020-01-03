@@ -1,16 +1,24 @@
 package com.chao.cloud.im.websocket;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.log.StaticLog;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
+
+import org.springframework.stereotype.Component;
+
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.chao.cloud.common.core.SpringContextUtil;
 import com.chao.cloud.common.exception.BusinessException;
 import com.chao.cloud.common.util.EntityUtil;
 import com.chao.cloud.im.ai.constant.AiConstant;
@@ -27,25 +35,22 @@ import com.chao.cloud.im.websocket.constant.MsgEnum;
 import com.chao.cloud.im.websocket.model.ImMsgDTO;
 import com.chao.cloud.im.websocket.model.WsMsgDTO;
 import com.chao.cloud.im.websocket.model.WsMsgVO;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONUtil;
+import cn.hutool.log.StaticLog;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 单聊
- * @功能：
- * @author： 薛超
- * @时间： 2019年6月26日
+ * 单聊 @功能： @author： 薛超 @时间： 2019年6月26日
+ * 
  * @version 1.0.0
  */
 @Slf4j
@@ -55,7 +60,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 	/**
 	 * 连接建立成功调用的方法
-	 *  
+	 * 
 	 */
 	@OnOpen
 	public void onOpen(Session session, @PathParam("sid") Integer sid) {
@@ -75,7 +80,8 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 	 * 收到客户端消息后调用的方法
 	 *
 	 * @param msg 客户端发送过来的消息
-	 * @throws IOException */
+	 * @throws IOException
+	 */
 	@OnMessage
 	public void onMessage(String msg, Session session) {
 		super.onMessage(msg, session);
@@ -91,7 +97,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 			List<Integer> receiveIds = CollUtil.toList(vo.getToid());
 			if (ImConstant.Type.GROUP.equals(vo.getType())) {// 是否为group
 				// 从容器中获取对象
-				ImGroupUserService imGroupUserService = SpringContextUtil.getBean(ImGroupUserService.class);
+				ImGroupUserService imGroupUserService = SpringUtil.getBean(ImGroupUserService.class);
 				// 查询
 				List<ImGroupUser> groupUsers = imGroupUserService
 						.list(Wrappers.<ImGroupUser>lambdaQuery().eq(ImGroupUser::getGroupId, vo.getToid()));
@@ -100,7 +106,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 						.collect(Collectors.toList());
 			}
 			// 添加数据库
-			ImMsgService imMsgService = SpringContextUtil.getBean(ImMsgService.class);
+			ImMsgService imMsgService = SpringUtil.getBean(ImMsgService.class);
 			imMsgService.saveOffLineMsg(vo, receiveIds);
 			// 发送
 			sendMsg(WsMsgDTO.buildMsg(MsgEnum.CHAT, vo), receiveIds);
@@ -116,6 +122,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 	/**
 	 * 给所有人发送消息
+	 * 
 	 * @param msg
 	 */
 	public void sendAll(WsMsgDTO msg) {
@@ -131,7 +138,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 	/**
 	 * 群发自定义消息
-	 * */
+	 */
 	public void sendMsg(WsMsgDTO msg, Collection<Integer> sids) {
 		StaticLog.info("[push-msg-user={},msg={}.]", sids, msg);
 		webSocketSet.forEach((sid, item) -> {
@@ -176,11 +183,12 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 	/**
 	 * 推送离线消息
+	 * 
 	 * @param session
 	 */
 	private void pushOffMsg() {
 		// 查询消息
-		ImMsgService imMsgService = SpringContextUtil.getBean(ImMsgService.class);
+		ImMsgService imMsgService = SpringUtil.getBean(ImMsgService.class);
 		List<ImMsg> list = imMsgService.list(Wrappers.<ImMsg>lambdaQuery().eq(ImMsg::getToid, sid));
 		if (CollUtil.isNotEmpty(list)) {
 			super.sendMessage(WsMsgDTO.buildMsg(MsgEnum.OFF_MSG, EntityUtil.listConver(list, ImMsgDTO.class)));
@@ -192,6 +200,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 	/**
 	 * 机器人回复
+	 * 
 	 * @param vo
 	 */
 	private void rebotReply(WsMsgVO vo) {
@@ -215,7 +224,7 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 
 		if (StrUtil.isNotBlank(imgName)) {
 			// 解析图片
-			TAipImageClassifyService imgClassifyService = SpringContextUtil.getBean(TAipImageClassifyService.class);
+			TAipImageClassifyService imgClassifyService = SpringUtil.getBean(TAipImageClassifyService.class);
 			try (InputStream in = URLUtil.getStream(URLUtil.toUrlForHttp(imgName))) {
 				byte[] image = IoUtil.readBytes(in);
 				String visionImg = imgClassifyService.visionImg(image);
@@ -233,10 +242,10 @@ public class LayimChatWebSocket extends BaseWsSocket<Integer> {
 		String result = AiConstant.ERROR_RESULT;
 		if (vo.getToid().equals(AiConstant.XUE)) {
 			// 查询
-			TAiRobotService robotService = SpringContextUtil.getBean(TAiRobotService.class);
+			TAiRobotService robotService = SpringUtil.getBean(TAiRobotService.class);
 			result = robotService.text(vo.getContent());
 		} else if (vo.getToid().equals(AiConstant.CHAO)) {
-			AipUnitService unitService = SpringContextUtil.getBean(AipUnitService.class);
+			AipUnitService unitService = SpringUtil.getBean(AipUnitService.class);
 			result = unitService.text(vo.getContent(), vo.getFromid());
 		}
 		reply(vo, result);
